@@ -15,7 +15,7 @@ y = \sigma(W \cdot X + b)
 * *`b`* 为神经元的偏置（如果没有此项，则函数只能拟合`输入为0时，输出也为0` 的线性关系，因此无法拟合任意的线性关系）
 * *`σ`* 为激活函数（让网络拥有拟合非线性函数的能力）
 
-<img src="./assets/image-20260208161458524.png" alt="image-20260208161458524" width="80%" />
+<img src="./assets/image-20260208201008339.png" alt="image-20260208201008339" width="90%" />
 
 ✨ **为了让神经网络可以拟合非线性关系的数据，因此可以在每层神经元后面加上一个激活函数，引入非线性！**
 
@@ -82,15 +82,85 @@ y = \sigma(W \cdot X + b)
 
 ✨ **反向传播：计算模型中所有可学习参数的梯度（偏导数）**
 
+✅ 第一步：搭建神经网络模型
 
+<img src="./assets/image-20260208203221951.png" alt="image-20260208203221951" width="60%"/>
 
+✅ 第二步：前向传播
+$$
+\begin{align*}
+a_1 &= w_1 \cdot x_1 + w_2 \cdot x_2 + b_1 &\quad y_1 &= \frac{1}{1+e^{-a_1}} \\
+a_2 &= w_3 \cdot x_1 + w_4 \cdot x_2 + b_2 &\quad y_2 &= \frac{1}{1+e^{-a_2}} \\
+a_3 &= w_5 \cdot z_1 + w_6 \cdot z_2 + b_3 &\quad y_3 &= \frac{1}{1+e^{-a_3}}
+\end{align*}
+$$
 
+✅ 第三步：反向传播
 
+**1. 选择合适的损失函数**
 
+`如果每次只训练一个样本，用 MSE 作为损失函数：`
+$$
+L = \text{MSE} = \frac{1}{2} \left( \hat{y} - y \right)^2 = \frac{1}{2} \left( {y}_3 - y \right)^2
+$$
 
+* *ŷ*：模型预测值，对应当前模型的 *y~3~*（比如这张图片是狗的概率 = 0.95）
+* *y*：真实值（如果这张图片真是狗，则标签为 1，否则标签为 0）
+* 1/2：实际的 MSE 是不需要除以 2 的，这里纯粹是为了简化反向传播时的计算
 
+<img src="./assets/image-20260208204530982.png" alt="image-20260208204530982" width="40%" />
 
+`如果每次训练 N 个样本，用 MSE 作为损失函数：`
+$$
+L = \text{MSE} =  \frac{1}{N} \sum_{i=1}^{N} \left( \hat{y}_i - y_i \right)^2
+$$
 
+* *ŷ*：模型预测值
+* *y*：真实值
+* *N*（batch_size ）：本次训练的样本数量
+
+> 比如：训练数据是 5 套房子的交易信息**（5 个样本，N=5）**，每套房子都用 3 个特征描述**（3 个输入变量，*x*~1~、*x*~2~、*x*~3~）**
+>
+> 网络会对这 5 个样本分别做前向传播得到 5 个预测值 *ŷ*，再和 5 个真实值 *y* 计算 MSE（除以 5）
+
+**2. 计算所有可训练参数的梯度，即对所有输入变量求偏导**
+
+这个神经网络里所有可训练参数为：权重*w*~1~、*w*~2~、*w*~3~、*w*~4~、*w*~5~、*w*~6~，以及偏置*b*~1~、*b*~2~、*b*~3~）
+$$
+\begin{cases}
+\frac{\partial L}{\partial w_6} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial w_6} = a \\
+\frac{\partial L}{\partial w_5} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial w_5} = b \\
+\frac{\partial L}{\partial w_4} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial y_2} \cdot \frac{\partial y_2}{\partial a_2} \cdot \frac{\partial a_2}{\partial w_4}= c \\
+\frac{\partial L}{\partial w_3} = \dots = d \\
+\frac{\partial L}{\partial w_2} = \dots = e \\
+\frac{\partial L}{\partial w_1} = \dots = f \\
+\end{cases}
+$$
+
+$$
+\begin{cases}
+\frac{\partial L}{\partial b_3} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial b_3} = g \\
+\frac{\partial L}{\partial b_2} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial y_2} \cdot \frac{\partial y_2}{\partial a_2} \cdot \frac{\partial a_2}{\partial b_2}= h \\
+\frac{\partial L}{\partial b_1} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial y_1} \cdot \frac{\partial y_1}{\partial a_1} \cdot \frac{\partial a_1}{\partial b_1}= i
+\end{cases}
+$$
+
+**3. 利用梯度下降法，更新参数**
+
+其中：*α* 为学习率
+$$
+\begin{cases}
+{w}_6 = {w}_6 - \alpha \cdot \frac{\partial L}{\partial w_6} = {w}_6 - \alpha \cdot {a} \\
+{w}_5 = {w}_5 - \alpha \cdot \frac{\partial L}{\partial w_5} = {w}_4 - \alpha \cdot {b} \\
+{w}_4 = {w}_4 - \alpha \cdot \frac{\partial L}{\partial w_4} = {w}_4 - \alpha \cdot {c} \\
+{w}_3 = {w}_3 - \alpha \cdot \frac{\partial L}{\partial w_3} = {w}_3 - \alpha \cdot {d} \\
+{w}_2 = {w}_2 - \alpha \cdot \frac{\partial L}{\partial w_2} = {w}_2 - \alpha \cdot {e} \\
+{w}_1 = {w}_1 - \alpha \cdot \frac{\partial L}{\partial w_1} = {w}_1 - \alpha \cdot {f} \\
+{b}_3 = {b}_3 - \alpha \cdot \frac{\partial L}{\partial b_3} = {b}_3 - \alpha \cdot {g} \\
+{b}_2 = {b}_2 - \alpha \cdot \frac{\partial L}{\partial b_2} = {b}_2 - \alpha \cdot {h} \\
+{b}_1 = {b}_1 - \alpha \cdot \frac{\partial L}{\partial b_1} = {b}_1 - \alpha \cdot {i} \\
+\end{cases}
+$$
 
 ## 二、注意力机制
 
