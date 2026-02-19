@@ -6,6 +6,10 @@
 
 ✨ **神经元的本质：描述输入和输出关系的数学函数！**
 
+```math
+y = \sigma(W \cdot X + b)
+```
+
 \[
 y = \sigma(W \cdot X + b)
 \]
