@@ -10,10 +10,6 @@
 y = \sigma(W \cdot X + b)
 ```
 
-\[
-y = \sigma(W \cdot X + b)
-\]
-
 其中：
 
 * *`W `*为权重矩阵
@@ -93,22 +89,24 @@ y = \sigma(W \cdot X + b)
 <img src="./assets/image-20260208203221951.png" alt="image-20260208203221951" width="60%"/>
 
 ✅ 第二步：前向传播
-$$
+
+```math
 \begin{align*}
 a_1 &= w_1 \cdot x_1 + w_2 \cdot x_2 + b_1 &\quad y_1 &= \frac{1}{1+e^{-a_1}} \\
 a_2 &= w_3 \cdot x_1 + w_4 \cdot x_2 + b_2 &\quad y_2 &= \frac{1}{1+e^{-a_2}} \\
 a_3 &= w_5 \cdot z_1 + w_6 \cdot z_2 + b_3 &\quad y_3 &= \frac{1}{1+e^{-a_3}}
 \end{align*}
-$$
+```
 
 ✅ 第三步：反向传播
 
 **1. 选择合适的损失函数**
 
 `如果每次只训练一个样本，用 MSE 作为损失函数：`
-$$
+
+```math
 L = \text{MSE} = \frac{1}{2} \left( \hat{y} - y \right)^2 = \frac{1}{2} \left( {y}_3 - y \right)^2
-$$
+```
 
 * *ŷ*：模型预测值，对应当前模型的 *y~3~*（比如这张图片是狗的概率 = 0.95）
 * *y*：真实值（如果这张图片真是狗，则标签为 1，否则标签为 0）
@@ -117,9 +115,10 @@ $$
 <img src="./assets/image-20260208204530982.png" alt="image-20260208204530982" width="40%" />
 
 `如果每次训练 N 个样本，用 MSE 作为损失函数：`
-$$
+
+```math
 L = \text{MSE} =  \frac{1}{N} \sum_{i=1}^{N} \left( \hat{y}_i - y_i \right)^2
-$$
+```
 
 * *ŷ*：模型预测值
 * *y*：真实值
@@ -132,7 +131,8 @@ $$
 **2. 计算所有可训练参数的梯度，即对所有输入变量求偏导**
 
 这个神经网络里所有可训练参数为：权重*w*~1~、*w*~2~、*w*~3~、*w*~4~、*w*~5~、*w*~6~，以及偏置*b*~1~、*b*~2~、*b*~3~）
-$$
+
+```math
 \begin{cases}
 \frac{\partial L}{\partial w_6} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial w_6} = a \\
 \frac{\partial L}{\partial w_5} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial w_5} = b \\
@@ -141,20 +141,21 @@ $$
 \frac{\partial L}{\partial w_2} = \dots = e \\
 \frac{\partial L}{\partial w_1} = \dots = f \\
 \end{cases}
-$$
+```
 
-$$
+```math
 \begin{cases}
 \frac{\partial L}{\partial b_3} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial b_3} = g \\
 \frac{\partial L}{\partial b_2} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial y_2} \cdot \frac{\partial y_2}{\partial a_2} \cdot \frac{\partial a_2}{\partial b_2}= h \\
 \frac{\partial L}{\partial b_1} = \frac{\partial L}{\partial y_3} \cdot \frac{\partial y_3}{\partial a_3} \cdot \frac{\partial a_3}{\partial y_1} \cdot \frac{\partial y_1}{\partial a_1} \cdot \frac{\partial a_1}{\partial b_1}= i
 \end{cases}
-$$
+```
 
 **3. 利用梯度下降法，更新参数**
 
 其中：*α* 为学习率
-$$
+
+```math
 \begin{cases}
 {w}_6 = {w}_6 - \alpha \cdot \frac{\partial L}{\partial w_6} = {w}_6 - \alpha \cdot {a} \\
 {w}_5 = {w}_5 - \alpha \cdot \frac{\partial L}{\partial w_5} = {w}_4 - \alpha \cdot {b} \\
@@ -166,9 +167,7 @@ $$
 {b}_2 = {b}_2 - \alpha \cdot \frac{\partial L}{\partial b_2} = {b}_2 - \alpha \cdot {h} \\
 {b}_1 = {b}_1 - \alpha \cdot \frac{\partial L}{\partial b_1} = {b}_1 - \alpha \cdot {i} \\
 \end{cases}
-$$
-
-
+```
 
 ## 二、注意力机制
 
@@ -211,9 +210,10 @@ $$
 **自注意力机制（Self-Attention）**、**多头注意力（Multi-Head Attention）** 的核心三要素，就是 Q、K、V 矩阵
 
 本质是通过 **向量映射 + 相似度计算** 让每个 token 根据自己的 Q（需求），找到其他 token 的 K（匹配标签），再拿走对应的 V（有用信息），最终每个 token 都融合了整句话中对自己有用的语义
-\[
+
+```math
 \text{Attention}(Q, K, V) = \text{Softmax}\left( \frac{QK^T}{\sqrt{d_k}} \right) V
-\]
+```
 
 - **Q (Query，查询)**：当前 token `「想了解其他 token 的什么信息？」`
 - **K (Key，键)**：当前 token `「能被其他 token 匹配的 "身份标识"」`
