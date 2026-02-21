@@ -471,5 +471,37 @@ L = \text{MSE} =  \frac{1}{N} \sum_{i=1}^{N} \left( \hat{y}_i - y_i \right)^2
 
 [旋转位置编码](https://www.bilibili.com/video/BV1FjrCBdESo/?spm_id_from=333.337.search-card.all.click)
 
+
+
+### 3.6 KV Cache 与 GQA
+
+**KV Cache 的本质：把过去算过的中间结果保存起来，不再重复计算**
+
+**GQA/分组多头自注意力：将查询头 Q 分成若干个组，组内的所有 Q 头共享同一组 K/V，可以有效降低 K/V 缓存占用**
+
+![image-20260221141755671](./assets/image-20260221141755671.png)
+
+✅ **以 Qwen3 的结构为例：**
+
+假设输入一个句子 “你是谁？” ，共 4 个 token
+
+大模型输出预测 “我”
+
+> 为了简化描述，假设这一批次输入只有一个句子，并且不考虑 <sos> <eos> <pad> 这些占位符
+
+<img src="./assets/image-20260221142123494.png" alt="image-20260221142123494" width="85%" />
+
+<img src="./assets/image-20260221152243117.png" alt="image-20260221152243117" width="80%" />
+
+
+
+<img src="./assets/image-20260221152416406.png" alt="image-20260221152416406" width="80%" />
+
+<img src="./assets/image-20260221152441407.png" alt="image-20260221152441407" width="zoom:67%" />
+
+### 3.7 手搓 Transformer（有空再学）
+
+[手搓 Transfoemer](https://www.bilibili.com/video/BV1nXjEzmEWC/?spm_id_from=333.337.search-card.all.click&vd_source=574c29b5b1f3af03fa689cdc1a496d81)
+
 ## 四、手搓一个LLM模型
 
